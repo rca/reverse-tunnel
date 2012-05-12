@@ -34,9 +34,9 @@ function test
     #echo "status ${status}"
 
     if [ "$status" != "0" ]; then
-        /sbin/stop tunnel &> /dev/null
-        /sbin/start tunnel &> /dev/null
-        echo "($USER) $(date): restarted tunnel" >> ${LOGFILE}
+        /sbin/stop reverse_tunnel &> /dev/null
+        /sbin/start reverse_tunnel &> /dev/null
+        echo "($USER) $(date): restarted reverse_tunnel" >> ${LOGFILE}
     fi;
 }
 

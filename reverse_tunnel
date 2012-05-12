@@ -1,14 +1,18 @@
 #!/bin/bash
 
-TUNNEL_USER=${TUNNEL_USER:-berto}
-TUNNEL_HOST=${TUNNEL_HOST:-sprocketlight.com}
-SSH_PORT=${SSH_PORT:-22022}
-IDENTITY=${IDENTITY:-/home/berto/.ssh/no_pw}
+# source local configuration
+REVERSE_TUNNEL_CONF=/etc/default/reverse_tunnel
+[ -e ${REVERSE_TUNNEL_CONF} ] && source ${REVERSE_TUNNEL_CONF}
 
-TEST_LOG=${TEST_LOG:-/var/log/tunnel_test.log}
-
+TUNNEL_USER=${TUNNEL_USER:-tunnel}
 USER=$(whoami)
-    
+
+SSH_PORT=${SSH_PORT:-22022}
+IDENTITY=${IDENTITY:-/home/tunnel/.ssh/id_rsa}
+LOGFILE=${LOGFILE:-/var/log/reverse_tunnel.log}
+
+[ -z ${TUNNEL_HOST} ] && echo "need to specify TUNNEL_HOST in environment" 1>&2 && exit 1
+
 function tunnel
 {
     while [ 1 ];
@@ -24,21 +28,15 @@ function tunnel
 
 function test
 {
-    stuff=$(ssh -p ${SSH_PORT} ${TUNNEL_HOST} 2>&1)
-    echo $stuff | grep -q -i 'permission denied'
+    output=$(ssh -p ${SSH_PORT} ${TUNNEL_HOST} 2>&1)
+    echo $output | grep -q -i 'permission denied'
     status=$?
-    #stuff=$(nc -w 5 ${TUNNEL_HOST} ${SSH_PORT})
-    #echo $stuff | grep -q OpenSSH
-    #status=${PIPESTATUS[1]}
-
     #echo "status ${status}"
 
     if [ "$status" != "0" ]; then
         /sbin/stop tunnel &> /dev/null
         /sbin/start tunnel &> /dev/null
-        echo "($USER) $(date): restarted tunnel" >> ${TEST_LOG}
-    else
-        echo "all good" > /dev/null
+        echo "($USER) $(date): restarted tunnel" >> ${LOGFILE}
     fi;
 }
 

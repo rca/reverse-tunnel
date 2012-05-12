@@ -27,6 +27,6 @@ The script by default assumes there will be a user named ```tunnel``` with a non
 
 ```
 IDENTITY=${IDENTITY:-/home/someuser/.ssh/no_pw}
-TUNNEL_USER=someuser
+TUNNEL_USER=someotheruser
 SSH_PORT=${SSH_PORT:-22023}
 ```
